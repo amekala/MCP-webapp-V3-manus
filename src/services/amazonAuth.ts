@@ -21,11 +21,19 @@ console.log('Config from config.js:', {
 // Validate environment configuration on load
 if (isBrowser) {
   console.log('\nValidating Amazon OAuth Configuration:');
-  if (!window.ENV?.AMAZON_CLIENT_ID) {
+  const clientId = window.ENV?.AMAZON_CLIENT_ID || window.ENV?.REACT_APP_AMAZON_CLIENT_ID;
+  const redirectUri = window.ENV?.AMAZON_REDIRECT_URI || window.ENV?.REACT_APP_AMAZON_REDIRECT_URI;
+  
+  console.log('- Client ID check result:', !!clientId);
+  console.log('- Client ID found as AMAZON_CLIENT_ID:', !!window.ENV?.AMAZON_CLIENT_ID);
+  console.log('- Client ID found as REACT_APP_AMAZON_CLIENT_ID:', !!window.ENV?.REACT_APP_AMAZON_CLIENT_ID);
+  console.log('- Client ID length:', clientId ? clientId.length : 0);
+  
+  if (!clientId) {
     console.error('Amazon OAuth Configuration Error: Client ID is not set in window.ENV');
     console.error('window.ENV state:', JSON.stringify(window.ENV, null, 2));
   }
-  if (!window.ENV?.AMAZON_REDIRECT_URI) {
+  if (!redirectUri) {
     console.error('Amazon OAuth Configuration Error: Redirect URI is not set in window.ENV');
   }
 }

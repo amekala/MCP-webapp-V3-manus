@@ -20,6 +20,29 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('VERCEL_ENV:', process.env.VERCEL_ENV);
 
 // Try to get Amazon OAuth credentials with expanded prefix options
+// Print raw environment variable values for debugging
+console.log('\nEXTREME DEBUGGING - Raw environment variables:');
+console.log('process.env.AMAZON_CLIENT_ID raw:', process.env.AMAZON_CLIENT_ID);
+console.log('process.env.AMAZON_CLIENT_ID type:', typeof process.env.AMAZON_CLIENT_ID);
+console.log('process.env.AMAZON_CLIENT_ID length:', process.env.AMAZON_CLIENT_ID ? process.env.AMAZON_CLIENT_ID.length : 'N/A');
+console.log('process.env.AMAZON_CLIENT_ID charCode check:', process.env.AMAZON_CLIENT_ID ? Array.from(process.env.AMAZON_CLIENT_ID).map(c => c.charCodeAt(0)) : 'N/A');
+
+// Try every possible environment variable name and format
+const amazonClientIdOptions = {
+  'AMAZON_CLIENT_ID': process.env.AMAZON_CLIENT_ID,
+  'amazon_client_id': process.env.amazon_client_id,
+  'Amazon_Client_Id': process.env.Amazon_Client_Id,
+  'NEXT_PUBLIC_AMAZON_CLIENT_ID': process.env.NEXT_PUBLIC_AMAZON_CLIENT_ID,
+  'REACT_APP_AMAZON_CLIENT_ID': process.env.REACT_APP_AMAZON_CLIENT_ID,
+  'VERCEL_AMAZON_CLIENT_ID': process.env.VERCEL_AMAZON_CLIENT_ID
+};
+
+console.log('\nAll possible environment variable names:');
+Object.entries(amazonClientIdOptions).forEach(([name, value]) => {
+  console.log(`- ${name}: ${value ? 'SET (length: ' + value.length + ')' : 'NOT SET'}`);
+});
+
+// Fallback to empty string if no environment variable is found
 const amazonClientId = 
   process.env.AMAZON_CLIENT_ID || 
   process.env.NEXT_PUBLIC_AMAZON_CLIENT_ID || 
@@ -32,6 +55,7 @@ console.log('amazonClientId first 5 chars (if set):', amazonClientId ? amazonCli
 console.log('amazonClientId is empty string:', amazonClientId === '');
 console.log('amazonClientId is undefined:', typeof amazonClientId === 'undefined');
 
+// Do the same for client secret and redirect URI
 const amazonClientSecret = 
   process.env.AMAZON_CLIENT_SECRET || 
   process.env.NEXT_PUBLIC_AMAZON_CLIENT_SECRET || 
@@ -87,11 +111,14 @@ AMAZON_REDIRECT_URI=${amazonRedirectUri}
 fs.writeFileSync('.env.production', envContent);
 
 // Create browser-accessible environment config with validation
+// Make sure we have both versions of the environment variables (with and without REACT_APP_ prefix)
 const publicEnvContent = `window.ENV = {
   REACT_APP_SUPABASE_URL: "${supabaseUrl}",
   REACT_APP_SUPABASE_ANON_KEY: "${supabaseAnonKey}",
   AMAZON_CLIENT_ID: "${amazonClientId}",
-  AMAZON_REDIRECT_URI: "${amazonRedirectUri}"
+  AMAZON_REDIRECT_URI: "${amazonRedirectUri}",
+  REACT_APP_AMAZON_CLIENT_ID: "${amazonClientId}", // Add duplicate for compatibility
+  REACT_APP_AMAZON_REDIRECT_URI: "${amazonRedirectUri}" // Add duplicate for compatibility
 };
 
 // Runtime validation
@@ -99,11 +126,14 @@ const publicEnvContent = `window.ENV = {
   console.log('Runtime environment check:');
   console.log('window.ENV:', JSON.stringify(window.ENV, null, 2));
   
-  if (!window.ENV.AMAZON_CLIENT_ID) {
+  const clientId = window.ENV.AMAZON_CLIENT_ID || window.ENV.REACT_APP_AMAZON_CLIENT_ID || '';
+  const redirectUri = window.ENV.AMAZON_REDIRECT_URI || window.ENV.REACT_APP_AMAZON_REDIRECT_URI || '';
+  
+  if (!clientId) {
     console.error('Amazon OAuth Error: Client ID is not configured. OAuth will not work.');
     console.error('Available ENV values:', Object.keys(window.ENV));
   }
-  if (!window.ENV.AMAZON_REDIRECT_URI) {
+  if (!redirectUri) {
     console.error('Amazon OAuth Error: Redirect URI is not configured. OAuth will not work.');
   }
 })();
