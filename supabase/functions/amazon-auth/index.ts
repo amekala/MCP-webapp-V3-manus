@@ -92,7 +92,7 @@ serve(async (req) => {
     }
 
     // Store tokens in database
-    const { data: tokenData, error: insertError } = await supabase
+    const { data: storedToken, error: insertError } = await supabase
       .from('amazon_tokens')
       .insert({
         user_id: userId,

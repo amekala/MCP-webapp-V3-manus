@@ -139,15 +139,25 @@ export const amazonAuth = {
           try {
             // Check if we're back on our domain (callback)
             if (popup.location.href.startsWith(redirectUri)) {
+              console.log('OAuth redirect detected, popup on callback URL:', popup.location.href);
               clearInterval(checkPopup);
-              popup.close();
-              resolve({ 
-                success: true, 
-                message: 'Authentication successful' 
-              });
+              
+              // Add a delay before closing the popup to allow the authentication to complete
+              // This gives the user time to see the completion message and allows the redirect to fully process
+              setTimeout(() => {
+                console.log('Closing popup after delay');
+                popup.close();
+                resolve({ 
+                  success: true, 
+                  message: 'Authentication successful' 
+                });
+              }, 3000); // 3 second delay
+              
+              return; // Exit early to prevent the interval from continuing
             }
           } catch (e) {
             // Cross-origin error, ignore (user is on Amazon domain)
+            console.log('Cross-origin access, user likely on Amazon domain');
           }
         }, 500);
       });
