@@ -9,6 +9,16 @@ interface AmazonAuthResponse {
 // Check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
+// Validate environment configuration on load
+if (isBrowser) {
+  if (!window.ENV?.REACT_APP_AMAZON_CLIENT_ID) {
+    console.error('Amazon OAuth Configuration Error: Client ID is not set in window.ENV');
+  }
+  if (!window.ENV?.REACT_APP_AMAZON_REDIRECT_URI) {
+    console.error('Amazon OAuth Configuration Error: Redirect URI is not set in window.ENV');
+  }
+}
+
 export const amazonAuth = {
   /**
    * Initiates the Amazon OAuth flow by opening a popup window
@@ -29,20 +39,28 @@ export const amazonAuth = {
       console.log('Amazon OAuth Debug:');
       console.log('- clientId available:', !!clientId);
       console.log('- redirectUri available:', !!redirectUri);
-      console.log('- Using clientId:', clientId);
+      console.log('- Using clientId:', clientId || 'NOT SET');
       console.log('- Using redirectUri:', redirectUri);
       console.log('- Environment:', isBrowser ? 'Browser' : 'Server');
-      console.log('- window.ENV:', isBrowser ? window.ENV : 'Not available');
+      console.log('- window.ENV:', isBrowser ? JSON.stringify(window.ENV, null, 2) : 'Not available');
       
-      if (!clientId || !redirectUri) {
-        console.error('Missing Amazon credentials:', {
-          clientId: !!clientId,
-          redirectUri: !!redirectUri,
-          env: isBrowser ? window.ENV : 'Server environment'
-        });
+      if (!clientId) {
+        const error = 'Amazon Client ID is not configured. Please check your environment variables.';
+        console.error('Amazon OAuth Error:', error);
+        console.error('Environment:', isBrowser ? window.ENV : 'Server environment');
         return { 
           success: false, 
-          error: 'Amazon API credentials not configured' 
+          error 
+        };
+      }
+
+      if (!redirectUri) {
+        const error = 'Amazon Redirect URI is not configured. Please check your environment variables.';
+        console.error('Amazon OAuth Error:', error);
+        console.error('Environment:', isBrowser ? window.ENV : 'Server environment');
+        return { 
+          success: false, 
+          error 
         };
       }
 
