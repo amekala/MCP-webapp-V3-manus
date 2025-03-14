@@ -19,7 +19,7 @@ const getEnv = (key, defaultValue = '') => {
     // Add your development values here when needed
     const devValues = {
       // You can manually add values here for local testing
-      // For example: REACT_APP_AMAZON_CLIENT_ID: 'your-dev-client-id'
+      // For example: AMAZON_CLIENT_ID: 'your-dev-client-id'
     };
     
     if (devValues[key]) {
@@ -37,8 +37,8 @@ export const config = {
   supabaseAnonKey: getEnv('REACT_APP_SUPABASE_ANON_KEY', ''),
   
   // Amazon OAuth
-  amazonClientId: getEnv('REACT_APP_AMAZON_CLIENT_ID', ''),
-  amazonRedirectUri: getEnv('REACT_APP_AMAZON_REDIRECT_URI', 'https://v0-ads-connect-project.vercel.app/auth-callback'),
+  amazonClientId: getEnv('AMAZON_CLIENT_ID', ''),
+  amazonRedirectUri: getEnv('AMAZON_REDIRECT_URI', 'https://v0-ads-connect-project.vercel.app/auth-callback'),
   
   // Helper method to check if all required config is available
   isConfigValid: () => {
@@ -46,8 +46,8 @@ export const config = {
     
     if (!config.supabaseUrl) missingVars.push('REACT_APP_SUPABASE_URL');
     if (!config.supabaseAnonKey) missingVars.push('REACT_APP_SUPABASE_ANON_KEY');
-    if (!config.amazonClientId) missingVars.push('REACT_APP_AMAZON_CLIENT_ID');
-    if (!config.amazonRedirectUri) missingVars.push('REACT_APP_AMAZON_REDIRECT_URI');
+    if (!config.amazonClientId) missingVars.push('AMAZON_CLIENT_ID');
+    if (!config.amazonRedirectUri) missingVars.push('AMAZON_REDIRECT_URI');
     
     if (missingVars.length > 0) {
       console.error(`Missing required configuration: ${missingVars.join(', ')}`);
