@@ -4,20 +4,18 @@ const fs = require('fs');
 const supabaseUrl = process.env.SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL || 'https://hzhzejqyjotckrntykxc.supabase.co';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
-// Amazon OAuth credentials are required
-const amazonClientId = process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID;
-const amazonClientSecret = process.env.AMAZON_CLIENT_SECRET || process.env.REACT_APP_AMAZON_CLIENT_SECRET;
+// Amazon OAuth credentials
+const amazonClientId = process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID || '';
+const amazonClientSecret = process.env.AMAZON_CLIENT_SECRET || process.env.REACT_APP_AMAZON_CLIENT_SECRET || '';
 const amazonRedirectUri = process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI || 'https://v0-ads-connect-project.vercel.app/auth-callback';
 
-// Validate required environment variables
+// Add warning for missing credentials but don't fail the build
 if (!amazonClientId) {
-  console.error('ERROR: AMAZON_CLIENT_ID or REACT_APP_AMAZON_CLIENT_ID is required but not set');
-  process.exit(1);
+  console.warn('WARNING: AMAZON_CLIENT_ID or REACT_APP_AMAZON_CLIENT_ID is not set');
 }
 
 if (!amazonClientSecret) {
-  console.error('ERROR: AMAZON_CLIENT_SECRET or REACT_APP_AMAZON_CLIENT_SECRET is required but not set');
-  process.exit(1);
+  console.warn('WARNING: AMAZON_CLIENT_SECRET or REACT_APP_AMAZON_CLIENT_SECRET is not set');
 }
 
 // Add more detailed logging for environment variables
@@ -35,7 +33,7 @@ console.log('- SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'SET' : 'MIS
 console.log('- REACT_APP_SUPABASE_ANON_KEY:', process.env.REACT_APP_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
 
 console.log('\nFinal resolved values:');
-console.log('- amazonClientId: SET');
+console.log('- amazonClientId:', amazonClientId ? 'SET' : 'MISSING');
 console.log('- amazonRedirectUri:', amazonRedirectUri);
 console.log('- supabaseUrl:', supabaseUrl);
 
@@ -57,14 +55,19 @@ fs.writeFileSync('.env.production', envContent);
 const publicEnvContent = `window.ENV = {
   REACT_APP_SUPABASE_URL: "${supabaseUrl}",
   REACT_APP_SUPABASE_ANON_KEY: "${supabaseAnonKey}",
-  REACT_APP_AMAZON_CLIENT_ID: "${amazonClientId || ''}",
+  REACT_APP_AMAZON_CLIENT_ID: "${amazonClientId}",
   REACT_APP_AMAZON_REDIRECT_URI: "${amazonRedirectUri}"
 };
 
-// Validate environment configuration
-if (!window.ENV.REACT_APP_AMAZON_CLIENT_ID) {
-  console.error('Amazon Client ID is not configured. OAuth will not work.');
-}
+// Runtime validation
+(function validateEnvironment() {
+  if (!window.ENV.REACT_APP_AMAZON_CLIENT_ID) {
+    console.error('Amazon OAuth Error: Client ID is not configured. OAuth will not work.');
+  }
+  if (!window.ENV.REACT_APP_AMAZON_REDIRECT_URI) {
+    console.error('Amazon OAuth Error: Redirect URI is not configured. OAuth will not work.');
+  }
+})();
 `;
 
 // Write to public folder to be served with the app
