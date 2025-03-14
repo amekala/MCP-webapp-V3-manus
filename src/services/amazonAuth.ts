@@ -6,6 +6,10 @@ interface AmazonAuthResponse {
   message?: string;
 }
 
+// FALLBACK VALUES - ONLY USED IF ENVIRONMENT VARIABLES FAIL
+const FALLBACK_CLIENT_ID = 'amzn1.application-oa2-client.86f9a8fbd7634f84881efb485fc49039';
+const FALLBACK_REDIRECT_URI = 'https://v0-ads-connect-project.vercel.app/auth/callback';
+
 // Check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
@@ -17,18 +21,20 @@ export const amazonAuth = {
    */
   initiateAuth: async (userId: string): Promise<AmazonAuthResponse> => {
     try {
-      // Check both browser ENV and Node.js env vars
+      // Check both browser ENV and Node.js env vars, with fallback
       const clientId = isBrowser 
-        ? window.ENV?.REACT_APP_AMAZON_CLIENT_ID
-        : (process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID);
+        ? (window.ENV?.REACT_APP_AMAZON_CLIENT_ID || FALLBACK_CLIENT_ID)
+        : (process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID || FALLBACK_CLIENT_ID);
       
       const redirectUri = isBrowser
-        ? window.ENV?.REACT_APP_AMAZON_REDIRECT_URI
-        : (process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI);
+        ? (window.ENV?.REACT_APP_AMAZON_REDIRECT_URI || FALLBACK_REDIRECT_URI)
+        : (process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI || FALLBACK_REDIRECT_URI);
       
       console.log('Amazon OAuth Debug:');
       console.log('- clientId available:', !!clientId);
       console.log('- redirectUri available:', !!redirectUri);
+      console.log('- Using clientId:', clientId);
+      console.log('- Using redirectUri:', redirectUri);
       
       if (!clientId || !redirectUri) {
         console.error('Missing Amazon credentials.', isBrowser ? window.ENV : 'Not in browser');
