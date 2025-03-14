@@ -6,8 +6,8 @@ declare global {
     ENV: {
       REACT_APP_SUPABASE_URL: string;
       REACT_APP_SUPABASE_ANON_KEY: string;
-      REACT_APP_AMAZON_CLIENT_ID: string;
-      REACT_APP_AMAZON_REDIRECT_URI: string;
+      AMAZON_CLIENT_ID: string;
+      AMAZON_REDIRECT_URI: string;
     };
   }
 }
