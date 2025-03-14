@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { config } from '../utils/config';
 
 interface AmazonAuthResponse {
   success: boolean;
@@ -12,10 +13,10 @@ const isBrowser = typeof window !== 'undefined';
 // Debug environment configuration
 console.log('\nAmazon Auth Module - Environment Debug:');
 console.log('Running in:', isBrowser ? 'Browser' : 'Server');
-if (isBrowser) {
-  console.log('window.ENV available:', !!window.ENV);
-  console.log('window.ENV contents:', JSON.stringify(window.ENV, null, 2));
-}
+console.log('Config from config.js:', {
+  amazonClientId: config.amazonClientId ? 'SET (hidden)' : 'NOT SET',
+  amazonRedirectUri: config.amazonRedirectUri
+});
 
 // Validate environment configuration on load
 if (isBrowser) {
@@ -37,32 +38,21 @@ export const amazonAuth = {
    */
   initiateAuth: async (userId: string): Promise<AmazonAuthResponse> => {
     try {
-      console.log('\nInitiating Amazon OAuth - Environment Check:');
-      console.log('isBrowser:', isBrowser);
-      console.log('window.ENV available:', isBrowser && !!window.ENV);
+      console.log('\nInitiating Amazon OAuth flow:');
       
-      // Get credentials from environment variables
-      const clientId = isBrowser 
-        ? window.ENV?.REACT_APP_AMAZON_CLIENT_ID
-        : (process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID);
-      
-      const redirectUri = isBrowser
-        ? window.ENV?.REACT_APP_AMAZON_REDIRECT_URI
-        : (process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI);
+      // Get credentials from our config helper
+      const clientId = config.amazonClientId;
+      const redirectUri = config.amazonRedirectUri;
       
       console.log('\nAmazon OAuth Debug:');
       console.log('- clientId available:', !!clientId);
       console.log('- redirectUri available:', !!redirectUri);
-      console.log('- Using clientId:', clientId || 'NOT SET');
-      console.log('- Using redirectUri:', redirectUri);
-      console.log('- Environment:', isBrowser ? 'Browser' : 'Server');
-      console.log('- window.ENV:', isBrowser ? JSON.stringify(window.ENV, null, 2) : 'Not available');
-      console.log('- Environment variables:', isBrowser ? 'Not available in browser' : process.env);
+      console.log('- clientId length:', clientId ? clientId.length : 0);
+      console.log('- redirectUri:', redirectUri);
       
       if (!clientId) {
         const error = 'Amazon Client ID is not configured. Please check your environment variables.';
         console.error('\nAmazon OAuth Error:', error);
-        console.error('Environment:', isBrowser ? JSON.stringify(window.ENV, null, 2) : 'Server environment');
         return { 
           success: false, 
           error 
@@ -71,8 +61,7 @@ export const amazonAuth = {
 
       if (!redirectUri) {
         const error = 'Amazon Redirect URI is not configured. Please check your environment variables.';
-        console.error('Amazon OAuth Error:', error);
-        console.error('Environment:', isBrowser ? window.ENV : 'Server environment');
+        console.error('\nAmazon OAuth Error:', error);
         return { 
           success: false, 
           error 
@@ -102,6 +91,12 @@ export const amazonAuth = {
       authUrl.searchParams.append('response_type', responseType);
       authUrl.searchParams.append('redirect_uri', redirectUri);
       authUrl.searchParams.append('state', state);
+      
+      console.log('- Opening Amazon OAuth URL with:', {
+        client_id: clientId ? 'SET (hidden)' : 'NOT SET',
+        scope,
+        redirect_uri: redirectUri
+      });
       
       // Open the authorization URL in a popup window
       const width = 600;
