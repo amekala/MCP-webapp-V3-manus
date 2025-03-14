@@ -28,4 +28,15 @@ REACT_APP_AMAZON_REDIRECT_URI=${amazonRedirectUri}
 // Write the content to .env.production
 fs.writeFileSync('.env.production', envContent);
 
+// Create browser-accessible environment config
+const publicEnvContent = `window.ENV = {
+  REACT_APP_SUPABASE_URL: "${supabaseUrl}",
+  REACT_APP_SUPABASE_ANON_KEY: "${supabaseAnonKey}",
+  REACT_APP_AMAZON_CLIENT_ID: "${amazonClientId}",
+  REACT_APP_AMAZON_REDIRECT_URI: "${amazonRedirectUri}"
+}`;
+
+// Write to public folder to be served with the app
+fs.writeFileSync('./public/env-config.js', publicEnvContent);
+
 console.log('Environment variables set up for production build'); 

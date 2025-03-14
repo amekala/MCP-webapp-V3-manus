@@ -6,12 +6,5 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/[^.]+", "dest": "/index.html" }
-  ],
-  "env": {
-    "REACT_APP_SUPABASE_URL": "@supabase_url",
-    "REACT_APP_SUPABASE_ANON_KEY": "@supabase_anon_key",
-    "REACT_APP_AMAZON_CLIENT_ID": "@amazon_client_id",
-    "REACT_APP_AMAZON_CLIENT_SECRET": "@amazon_client_secret",
-    "REACT_APP_AMAZON_REDIRECT_URI": "@amazon_redirect_uri"
-  }
+  ]
 } 

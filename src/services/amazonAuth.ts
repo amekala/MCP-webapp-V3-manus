@@ -6,6 +6,9 @@ interface AmazonAuthResponse {
   message?: string;
 }
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export const amazonAuth = {
   /**
    * Initiates the Amazon OAuth flow by opening a popup window
@@ -14,17 +17,21 @@ export const amazonAuth = {
    */
   initiateAuth: async (userId: string): Promise<AmazonAuthResponse> => {
     try {
-      // Check both Vercel naming and React naming
-      const clientId = process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID;
-      const redirectUri = process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI;
+      // Check both browser ENV and Node.js env vars
+      const clientId = isBrowser 
+        ? window.ENV?.REACT_APP_AMAZON_CLIENT_ID
+        : (process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID);
+      
+      const redirectUri = isBrowser
+        ? window.ENV?.REACT_APP_AMAZON_REDIRECT_URI
+        : (process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI);
       
       console.log('Amazon OAuth Debug:');
       console.log('- clientId available:', !!clientId);
       console.log('- redirectUri available:', !!redirectUri);
       
       if (!clientId || !redirectUri) {
-        console.error('Missing Amazon credentials. Available env vars:', 
-          Object.keys(process.env).filter(key => key.includes('AMAZON')));
+        console.error('Missing Amazon credentials.', isBrowser ? window.ENV : 'Not in browser');
         return { 
           success: false, 
           error: 'Amazon API credentials not configured' 
