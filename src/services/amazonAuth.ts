@@ -14,10 +14,17 @@ export const amazonAuth = {
    */
   initiateAuth: async (userId: string): Promise<AmazonAuthResponse> => {
     try {
-      const clientId = process.env.REACT_APP_AMAZON_CLIENT_ID;
-      const redirectUri = process.env.REACT_APP_AMAZON_REDIRECT_URI;
+      // Check both Vercel naming and React naming
+      const clientId = process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID;
+      const redirectUri = process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI;
+      
+      console.log('Amazon OAuth Debug:');
+      console.log('- clientId available:', !!clientId);
+      console.log('- redirectUri available:', !!redirectUri);
       
       if (!clientId || !redirectUri) {
+        console.error('Missing Amazon credentials. Available env vars:', 
+          Object.keys(process.env).filter(key => key.includes('AMAZON')));
         return { 
           success: false, 
           error: 'Amazon API credentials not configured' 

@@ -1,6 +1,6 @@
 {
   "short_name": "AdsConnect",
-  "name": "AdsConnect - Amazon Advertising API Authentication",
+  "name": "AdsConnect - Amazon Advertising API Platform",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#ff9900",
+  "theme_color": "#000000",
   "background_color": "#ffffff"
 }
