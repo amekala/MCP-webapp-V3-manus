@@ -5,7 +5,7 @@ const supabaseUrl = process.env.SUPABASE_URL || process.env.REACT_APP_SUPABASE_U
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 const amazonClientId = process.env.AMAZON_CLIENT_ID || process.env.REACT_APP_AMAZON_CLIENT_ID || '';
 const amazonClientSecret = process.env.AMAZON_CLIENT_SECRET || process.env.REACT_APP_AMAZON_CLIENT_SECRET || '';
-const amazonRedirectUri = process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI || 'https://v0-ads-connect-project.vercel.app/auth/callback';
+const amazonRedirectUri = process.env.AMAZON_REDIRECT_URI || process.env.REACT_APP_AMAZON_REDIRECT_URI || 'https://v0-ads-connect-project.vercel.app/auth-callback';
 
 // Add more detailed logging for environment variables
 console.log('DETAILED ENVIRONMENT CHECK:');
@@ -13,17 +13,15 @@ console.log('SUPABASE_URL from env:', process.env.SUPABASE_URL);
 console.log('REACT_APP_SUPABASE_URL from env:', process.env.REACT_APP_SUPABASE_URL);
 console.log('SUPABASE_ANON_KEY from env:', process.env.SUPABASE_ANON_KEY ? 'PRESENT (hidden for security)' : 'MISSING');
 console.log('REACT_APP_SUPABASE_ANON_KEY from env:', process.env.REACT_APP_SUPABASE_ANON_KEY ? 'PRESENT (hidden for security)' : 'MISSING');
-console.log('AMAZON_CLIENT_ID from env:', process.env.AMAZON_CLIENT_ID);
-console.log('REACT_APP_AMAZON_CLIENT_ID from env:', process.env.REACT_APP_AMAZON_CLIENT_ID);
-console.log('AMAZON_REDIRECT_URI from env:', process.env.AMAZON_REDIRECT_URI);
-console.log('REACT_APP_AMAZON_REDIRECT_URI from env:', process.env.REACT_APP_AMAZON_REDIRECT_URI);
+console.log('AMAZON_CLIENT_ID from env:', process.env.AMAZON_CLIENT_ID || 'MISSING');
+console.log('REACT_APP_AMAZON_CLIENT_ID from env:', process.env.REACT_APP_AMAZON_CLIENT_ID || 'MISSING');
+console.log('AMAZON_REDIRECT_URI from env:', process.env.AMAZON_REDIRECT_URI || 'MISSING');
+console.log('REACT_APP_AMAZON_REDIRECT_URI from env:', process.env.REACT_APP_AMAZON_REDIRECT_URI || 'MISSING');
 
-console.log('Environment check:');
-console.log('- SUPABASE_URL present:', !!process.env.SUPABASE_URL);
-console.log('- SUPABASE_ANON_KEY present:', !!process.env.SUPABASE_ANON_KEY);
-console.log('- AMAZON_CLIENT_ID present:', !!process.env.AMAZON_CLIENT_ID);
-console.log('- AMAZON_CLIENT_SECRET present:', !!process.env.AMAZON_CLIENT_SECRET);
-console.log('- AMAZON_REDIRECT_URI present:', !!process.env.AMAZON_REDIRECT_URI);
+console.log('\nFinal resolved values:');
+console.log('- amazonClientId:', amazonClientId ? 'SET (value hidden)' : 'MISSING');
+console.log('- amazonRedirectUri:', amazonRedirectUri);
+console.log('- supabaseUrl:', supabaseUrl);
 
 // Create the content for .env.production
 const envContent = `# Supabase Configuration
@@ -50,8 +48,6 @@ const publicEnvContent = `window.ENV = {
 // Write to public folder to be served with the app
 fs.writeFileSync('./public/env-config.js', publicEnvContent);
 
-console.log('Environment variables set up for production build');
-console.log('Final values being sent to browser:');
-console.log('- supabaseUrl:', supabaseUrl);
-console.log('- amazonClientId:', amazonClientId ? 'SET (value hidden)' : 'EMPTY');
-console.log('- amazonRedirectUri:', amazonRedirectUri); 
+console.log('\nEnvironment files created:');
+console.log('- .env.production');
+console.log('- public/env-config.js'); 
